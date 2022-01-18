@@ -13,7 +13,7 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.0.0
+  Version:        1.0.1
   Author:         Andreas Dieckmann
   Creation Date:  2022-01-18
   GitHub:         https://github.com/diecknet/SimpleAzureVMStartStop
@@ -77,7 +77,7 @@ try {
 catch {
     $ErrorMessage = $_.Exception.message
     Write-Error ("Error connecting to Azure: " + $ErrorMessage)
-    Break
+    exit 1
 }
 
 # select Azure subscription by ID if specified, suppress output
@@ -88,17 +88,33 @@ if ($AzureSubscriptionID) {
     catch {
         $ErrorMessage = $_.Exception.message
         Write-Error ("Error selecting Azure Subscription ($AzureSubscriptionID): " + $ErrorMessage)
-        Break
+        exit 1
     }
 }
 
 if ($VMName -eq "*") {
-    # if "*" was given as the VMName, get all VMs in the resource group
-    $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName
+    try {
+        # if "*" was given as the VMName, get all VMs in the resource group
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName
+    }
+    catch {
+        $ErrorMessage = $_.Exception.message
+        Write-Error ("Error getting VMs from resource group ($ResourceGroupName): " + $ErrorMessage)
+        exit 1
+    }
+    
 }
 else {
-    # get only the specified VM
-    $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
+    try {
+        # get only the specified VM
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
+    }
+    catch {
+        $ErrorMessage = $_.Exception.message
+        Write-Error ("Error getting VM ($VMName) from resource group ($ResourceGroupName): " + $ErrorMessage)
+        exit 1
+    }
+    
 }
 
 # Loop through all specified VMs (if more than one). The loop only executes once if only one VM is specified.
