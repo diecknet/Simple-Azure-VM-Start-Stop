@@ -5,6 +5,7 @@ The Managed Identity needs the permissions according to [`CustomRoleDefinition.j
 
 ## Features
 
+- Starts/Stops one specific VM or all VMs in a Resource Group
 - Uses the modern ("Az") Azure PowerShell module (instead of the old AzureRm module)
 - Uses Managed Identity instead of RunAs Accounts
 - Simple
