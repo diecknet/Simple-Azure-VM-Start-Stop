@@ -1,0 +1,18 @@
+{
+    "properties": {
+        "roleName": "StartStopVM",
+        "description": "Custom role to read/start/stop a VM",
+        "assignableScopes": [],
+        "permissions": [{
+                "actions": [
+					"Microsoft.Compute/virtualMachines/start/action",
+					"Microsoft.Compute/virtualMachines/deallocate/action",
+					"Microsoft.Compute/virtualMachines/read"
+				],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+    }
+}
