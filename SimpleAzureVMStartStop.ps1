@@ -13,9 +13,9 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.0.1
+  Version:        1.1.0
   Author:         Andreas Dieckmann
-  Creation Date:  2022-01-18
+  Creation Date:  2022-03-11
   GitHub:         https://github.com/diecknet/SimpleAzureVMStartStop
   Blog:           https://diecknet.de
   License:        MIT License
@@ -90,6 +90,19 @@ if ($AzureSubscriptionID) {
         Write-Error ("Error selecting Azure Subscription ($AzureSubscriptionID): " + $ErrorMessage)
         exit 1
     }
+}
+
+# check if we are in an Azure Context
+try {
+    $AzContext = Get-AzContext
+}
+catch {
+    Write-Error ("Error while trying to retrieve the Azure Context: " + $ErrorMessage)
+    exit 1
+}
+if ([string]::IsNullOrEmpty($AzContext.Subscription)) {
+    Write-Error "Error. Didn't find any Azure Context. Have you assigned the permissions according to 'CustomRoleDefinition.json' to the Managed Identity? 🤓"
+    exit 1
 }
 
 if ($VMName -eq "*") {
