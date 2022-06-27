@@ -13,10 +13,10 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.1.0
+  Version:        1.2.0
   Author:         Andreas Dieckmann
   Creation Date:  2022-03-11
-  GitHub:         https://github.com/diecknet/SimpleAzureVMStartStop
+  GitHub:         https://github.com/diecknet/Simple-Azure-VM-Start-Stop
   Blog:           https://diecknet.de
   License:        MIT License
 
@@ -43,7 +43,7 @@
 .LINK 
   https://diecknet.de/
 .LINK
-  https://github.com/diecknet/SimpleAzureVMStartStop
+  https://github.com/diecknet/Simple-Azure-VM-Start-Stop
 
 .INPUTS
     None
@@ -70,14 +70,17 @@ param(
 
 Write-Output "Script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
+$errorCount = 0
+
 # connect to Azure, suppress output
 try {
     $null = Connect-AzAccount -Identity
 }
 catch {
-    $ErrorMessage = $_.Exception.message
-    Write-Error ("Error connecting to Azure: " + $ErrorMessage)
-    exit 1
+    $ErrorMessage = "Error connecting to Azure: " + $_.Exception.message
+    Write-Error $ErrorMessage
+    throw $ErrorMessage
+    exit
 }
 
 # select Azure subscription by ID if specified, suppress output
@@ -86,9 +89,10 @@ if ($AzureSubscriptionID) {
         $null = Select-AzSubscription -SubscriptionID $AzureSubscriptionID    
     }
     catch {
-        $ErrorMessage = $_.Exception.message
-        Write-Error ("Error selecting Azure Subscription ($AzureSubscriptionID): " + $ErrorMessage)
-        exit 1
+        $ErrorMessage = "Error selecting Azure Subscription ($AzureSubscriptionID): " + $_.Exception.message
+        Write-Error $ErrorMessage
+        throw $ErrorMessage
+        exit
     }
 }
 
@@ -97,12 +101,16 @@ try {
     $AzContext = Get-AzContext
 }
 catch {
-    Write-Error ("Error while trying to retrieve the Azure Context: " + $ErrorMessage)
-    exit 1
+    $ErrorMessage = "Error while trying to retrieve the Azure Context: " + $_.Exception.message
+    Write-Error $ErrorMessage
+    throw $ErrorMessage
+    exit
 }
 if ([string]::IsNullOrEmpty($AzContext.Subscription)) {
-    Write-Error "Error. Didn't find any Azure Context. Have you assigned the permissions according to 'CustomRoleDefinition.json' to the Managed Identity? 🤓"
-    exit 1
+    $ErrorMessage = "Error. Didn't find any Azure Context. Have you assigned the permissions according to 'CustomRoleDefinition.json' to the Managed Identity?"
+    Write-Error $ErrorMessage
+    throw $ErrorMessage
+    exit
 }
 
 if ($VMName -eq "*") {
@@ -111,9 +119,11 @@ if ($VMName -eq "*") {
         $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName
     }
     catch {
-        $ErrorMessage = $_.Exception.message
-        Write-Error ("Error getting VMs from resource group ($ResourceGroupName): " + $ErrorMessage)
-        exit 1
+        $ErrorMessage = "Error getting VMs from resource group ($ResourceGroupName): " + $_.Exception.message
+
+        Write-Error $ErrorMessage
+        throw $ErrorMessage
+        exit
     }
     
 }
@@ -123,9 +133,10 @@ else {
         $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
     }
     catch {
-        $ErrorMessage = $_.Exception.message
-        Write-Error ("Error getting VM ($VMName) from resource group ($ResourceGroupName): " + $ErrorMessage)
-        exit 1
+        $ErrorMessage = "Error getting VM ($VMName) from resource group ($ResourceGroupName): " + $_.Exception.message
+        Write-Error $ErrorMessage
+        throw $ErrorMessage
+        exit
     }
     
 }
@@ -141,7 +152,9 @@ foreach ($VM in $VMs) {
             }
             catch {
                 $ErrorMessage = $_.Exception.message
-                Write-Error ("Error starting the VM $($VM.Name): " + $ErrorMessage)
+                Write-Error "Error starting the VM $($VM.Name): " + $ErrorMessage
+                # increase error count
+                $errorCount++
                 Break
             }
         }
@@ -153,11 +166,17 @@ foreach ($VM in $VMs) {
             }
             catch {
                 $ErrorMessage = $_.Exception.message
-                Write-Error ("Error stopping the VM $($VM.Name): " + $ErrorMessage)
+                Write-Error "Error stopping the VM $($VM.Name): " + $ErrorMessage
+                # increase error count
+                $errorCount++
                 Break
             }
         }    
     }
 }
 
-Write-Output "Script ended at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+$endOfScriptText = "Script ended at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+if ($errorCount -gt 0) {
+    throw "Errors occured: $errorCount `r`n$endofScriptText"
+}
+Write-Output $endOfScriptText
