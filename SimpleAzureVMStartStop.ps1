@@ -13,7 +13,7 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.2.1
+  Version:        1.2.2
   Author:         Andreas Dieckmann
   Creation Date:  2023-09-21
   GitHub:         https://github.com/diecknet/Simple-Azure-VM-Start-Stop
@@ -123,7 +123,7 @@ if ([string]::IsNullOrEmpty($AzContext.Subscription)) {
 if ($VMName -eq "*") {
     try {
         # if "*" was given as the VMName, get all VMs in the resource group
-        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -ErrorAction Stop
     }
     catch {
         $ErrorMessage = "Error getting VMs from resource group ($ResourceGroupName): " + $_.Exception.message
@@ -137,7 +137,7 @@ if ($VMName -eq "*") {
 else {
     try {
         # get only the specified VM
-        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName -ErrorAction Stop
     }
     catch {
         $ErrorMessage = "Error getting VM ($VMName) from resource group ($ResourceGroupName): " + $_.Exception.message
