@@ -13,9 +13,9 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.2.0
+  Version:        1.2.1
   Author:         Andreas Dieckmann
-  Creation Date:  2022-03-11
+  Creation Date:  2023-09-21
   GitHub:         https://github.com/diecknet/Simple-Azure-VM-Start-Stop
   Blog:           https://diecknet.de
   License:        MIT License
@@ -69,6 +69,13 @@ param(
 )
 
 Write-Output "Script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+
+# temporarily hide Warning message (see Issue #2 in Github)
+$WarningPreference = "SilentlyContinue"
+# explicitly load the required PowerShell Az modules
+Import-Module Az.Accounts,Az.Compute
+# re-set WarningPreference to show Warning Messages
+$WarningPreference = "Continue"
 
 $errorCount = 0
 
