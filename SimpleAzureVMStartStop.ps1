@@ -13,9 +13,9 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.2.0
+  Version:        1.2.1
   Author:         Andreas Dieckmann
-  Creation Date:  2022-03-11
+  Creation Date:  2023-09-21
   GitHub:         https://github.com/diecknet/Simple-Azure-VM-Start-Stop
   Blog:           https://diecknet.de
   License:        MIT License
