@@ -70,6 +70,13 @@ param(
 
 Write-Output "Script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
+# temporarily hide Warning message (see Issue #2 in Github)
+$WarningPreference = "SilentlyContinue"
+# explicitly load the required PowerShell Az modules
+Import-Module Az.Accounts,Az.Compute
+# re-set WarningPreference to show Warning Messages
+$WarningPreference = "Continue"
+
 $errorCount = 0
 
 # connect to Azure, suppress output
