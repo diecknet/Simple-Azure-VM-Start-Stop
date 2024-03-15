@@ -50,13 +50,29 @@
 
 .OUTPUTS
     String to determine result of the script
+
+.PARAMETER userAssignedIdentityClientId
+Specify the Managed Identity Client ID if applicable.
+
+.PARAMETER VMName
+Specify the name of the Virtual Machine, or use the asterisk symbol "*" to affect all VMs in the resource group.
+
+.PARAMETER ResourceGroupName
+Specifies the name of the resource group containing the VM(s).
+
+.PARAMETER AzureSubscriptionID
+Optionally specify Azure Subscription ID.
+
+.PARAMETER Action
+Specify desired Action, allowed values "Start" or "Stop".
+
 #>
 
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false, HelpMessage = "Specify the Managed Identity Client ID if applicable.")]
     [string]
-    $miClientId,
+    $userAssignedIdentityClientId,
 
     [Parameter(Mandatory = $true, HelpMessage = "Specify the VM name or '*' for all VMs in the resource group.")]
     [string]
@@ -89,9 +105,9 @@ $errorCount = 0
 
 # connect to Azure, suppress output
 try {
-    if($miClientId) {
-        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $miClientId..."
-        $null = Connect-AzAccount -Identity -AccountId $miClientId
+    if($userAssignedIdentityClientId) {
+        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $userAssignedIdentityClientId..."
+        $null = Connect-AzAccount -Identity -AccountId $userAssignedIdentityClientId
     }
     else {
         Write-Output "Trying to connect to Azure with a system assigned Identity..."
