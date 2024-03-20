@@ -4,6 +4,7 @@
 .DESCRIPTION
  This script is intended to start or stop Azure Virtual Machines in a simple way in Azure Automation.
  The script uses Azure Automation Managed Identity and the modern ("Az") Azure PowerShell Module.
+ Both system-assigned and user-assigned Managed Identites are supported.
     
  Requirements:
  Give the Azure Automation Managed Identity necessary rights to Start/Stop VMs in the Resource Group.
@@ -13,14 +14,15 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.2.2
+  Version:        1.3.0
   Author:         Andreas Dieckmann
   Creation Date:  2023-09-21
+  Last update:    2024-03-20
   GitHub:         https://github.com/diecknet/Simple-Azure-VM-Start-Stop
   Blog:           https://diecknet.de
   License:        MIT License
 
-  Copyright (c) 2022 Andreas Dieckmann
+  Copyright (c) 2024 Andreas Dieckmann and other contributors
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +53,7 @@
 .OUTPUTS
     String to determine result of the script
 
-.PARAMETER userAssignedIdentityClientId
+.PARAMETER UserAssignedIdentityClientId
 Specify the Managed Identity Client ID if applicable.
 
 .PARAMETER VMName
@@ -72,7 +74,7 @@ Specify desired Action, allowed values "Start" or "Stop".
 param(
     [Parameter(Mandatory = $false, HelpMessage = "Specify the Managed Identity Client ID if applicable.")]
     [string]
-    $userAssignedIdentityClientId,
+    $UserAssignedIdentityClientId,
 
     [Parameter(Mandatory = $true, HelpMessage = "Specify the VM name or '*' for all VMs in the resource group.")]
     [string]
@@ -105,13 +107,13 @@ $errorCount = 0
 
 # connect to Azure, suppress output
 try {
-    if($userAssignedIdentityClientId) {
-        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $userAssignedIdentityClientId..."
-        $null = Connect-AzAccount -Identity -AccountId $userAssignedIdentityClientId
+    if($UserAssignedIdentityClientId) {
+        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $UserAssignedIdentityClientId..."
+        $null = Connect-AzAccount -Identity -AccountId $UserAssignedIdentityClientId
     }
     else {
         Write-Output "Trying to connect to Azure with a system assigned Identity..."
-    $null = Connect-AzAccount -Identity
+        $null = Connect-AzAccount -Identity
     }
 }
 catch {
