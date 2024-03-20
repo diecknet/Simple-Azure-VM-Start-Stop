@@ -51,20 +51,44 @@
 .OUTPUTS
     String to determine result of the script
 
+.PARAMETER userAssignedIdentityClientId
+Specify the Managed Identity Client ID if applicable.
+
+.PARAMETER VMName
+Specify the name of the Virtual Machine, or use the asterisk symbol "*" to affect all VMs in the resource group.
+
+.PARAMETER ResourceGroupName
+Specifies the name of the resource group containing the VM(s).
+
+.PARAMETER AzureSubscriptionID
+Optionally specify Azure Subscription ID.
+
+.PARAMETER Action
+Specify desired Action, allowed values "Start" or "Stop".
+
 #>
 
+[CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
-    # Specify the name of the Virtual Machine, or use the asterisk symbol "*" to affect all VMs in the resource group
+    [Parameter(Mandatory = $false, HelpMessage = "Specify the Managed Identity Client ID if applicable.")]
+    [string]
+    $userAssignedIdentityClientId,
+
+    [Parameter(Mandatory = $true, HelpMessage = "Specify the VM name or '*' for all VMs in the resource group.")]
+    [string]
     $VMName,
-    [Parameter(Mandatory = $true)]
+
+    [Parameter(Mandatory = $true, HelpMessage = "Specify the name of the resource group containing the VM(s).")]
+    [string]
     $ResourceGroupName,
-    [Parameter(Mandatory = $false)]
-    # Optionally specify Azure Subscription ID
+
+    [Parameter(Mandatory = $false, HelpMessage = "Optionally specify the Azure Subscription ID.")]
+    [string]
     $AzureSubscriptionID,
-    [Parameter(Mandatory = $true)]
+
+    [Parameter(Mandatory = $true, HelpMessage = "Specify 'Start' or 'Stop' to control the VM(s).")]
     [ValidateSet("Start", "Stop")]
-    # Specify desired Action, allowed values "Start" or "Stop"
+    [string]
     $Action
 )
 
@@ -81,7 +105,14 @@ $errorCount = 0
 
 # connect to Azure, suppress output
 try {
+    if($userAssignedIdentityClientId) {
+        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $userAssignedIdentityClientId..."
+        $null = Connect-AzAccount -Identity -AccountId $userAssignedIdentityClientId
+    }
+    else {
+        Write-Output "Trying to connect to Azure with a system assigned Identity..."
     $null = Connect-AzAccount -Identity
+    }
 }
 catch {
     $ErrorMessage = "Error connecting to Azure: " + $_.Exception.message
