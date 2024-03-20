@@ -53,7 +53,7 @@
 .OUTPUTS
     String to determine result of the script
 
-.PARAMETER userAssignedIdentityClientId
+.PARAMETER UserAssignedIdentityClientId
 Specify the Managed Identity Client ID if applicable.
 
 .PARAMETER VMName
@@ -74,7 +74,7 @@ Specify desired Action, allowed values "Start" or "Stop".
 param(
     [Parameter(Mandatory = $false, HelpMessage = "Specify the Managed Identity Client ID if applicable.")]
     [string]
-    $userAssignedIdentityClientId,
+    $UserAssignedIdentityClientId,
 
     [Parameter(Mandatory = $true, HelpMessage = "Specify the VM name or '*' for all VMs in the resource group.")]
     [string]
@@ -107,9 +107,9 @@ $errorCount = 0
 
 # connect to Azure, suppress output
 try {
-    if($userAssignedIdentityClientId) {
-        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $userAssignedIdentityClientId..."
-        $null = Connect-AzAccount -Identity -AccountId $userAssignedIdentityClientId
+    if($UserAssignedIdentityClientId) {
+        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $UserAssignedIdentityClientId..."
+        $null = Connect-AzAccount -Identity -AccountId $UserAssignedIdentityClientId
     }
     else {
         Write-Output "Trying to connect to Azure with a system assigned Identity..."
