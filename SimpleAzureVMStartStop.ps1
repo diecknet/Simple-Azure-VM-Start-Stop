@@ -113,7 +113,7 @@ try {
     }
     else {
         Write-Output "Trying to connect to Azure with a system assigned Identity..."
-    $null = Connect-AzAccount -Identity
+        $null = Connect-AzAccount -Identity
     }
 }
 catch {
